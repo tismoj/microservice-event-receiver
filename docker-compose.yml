@@ -1,0 +1,118 @@
+version: '3'
+services:
+  api:
+    build: ./api/
+    hostname: "api"
+    depends_on:
+      - rabbitmq
+      - hello_microservice
+      - event_listener_registrar_microservice
+      - event_receiver_microservice
+    ports:
+      - "8888:8080"
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "python", "-u", "api.py"]
+    restart: always
+
+  hello_microservice:
+    build: ./hello_microservice/
+    depends_on:
+      - rabbitmq
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "nameko", "run", "--broker", "amqp://guest:guest@rabbitmq", "hello_microservice"]
+
+  event_listener_registrar_microservice:
+    build: event_listener_registrar_microservice/
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./common_lib:/app/common_lib
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "nameko", "run", "--broker", "amqp://guest:guest@rabbitmq", "event_listener_registrar_microservice"]
+    restart: always
+
+  event_receiver_microservice:
+    build: ./event_receiver_microservice/
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./common_lib:/app/common_lib
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "nameko", "run", "--broker", "amqp://guest:guest@rabbitmq", "event_receiver_microservice"]
+    restart: always
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: rabbitmq
+#    ports:
+#      - "15672:15672"
+#      - "5672:5672"
+    restart: always
+
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - ./redis_data:/data
+#    ports:
+#      - "6379:6379"
+    restart: always
+
+  event_dispatcher:
+    build: ./event_dispatcher/
+    hostname: "event_dispatcher"
+    depends_on:
+      - rabbitmq
+      - event_listener_registrar_microservice
+      - event_receiver_microservice
+      - mongo
+    volumes:
+      - ./common_lib:/app/common_lib
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "./wait-for-it.sh", "mongo:27017", "--", "python", "-u", "event_dispatcher.py"]
+    restart: always
+
+  retro_event_retriever:
+    build: ./retro_event_retriever/
+    hostname: "retro_event_retriever"
+    depends_on:
+      - rabbitmq
+      - event_listener_registrar_microservice
+      - event_receiver_microservice
+      - mongo
+      - event_dispatcher
+    volumes:
+      - ./common_lib:/app/common_lib
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "./wait-for-it.sh", "mongo:27017", "--", "python", "-u", "retro_event_retriever.py"]
+    restart: always
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongodb/:/home/mongodb/
+      - ./data/db/:/data/db/
+      - ./data/configdb/:/data/configdb/
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+      ### Use this on MacOS hosts, MongoDB and the MacOS FS mapping has issues, only volume mapping will work properly
+#      - mongodb:/home/mongodb/
+#      - mongodb_data_db:/data/db/
+#      - mongodb_data_configdb:/data/configdb/
+#      - mongodb_docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d/
+#    ports:
+#      - 27017:27017
+    command: --storageEngine wiredTiger --directoryperdb
+    restart: always
+
+#  mongo-express:
+#    image: mongo-express
+#    depends_on:
+#      - mongo
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#    ports:
+#      - 8081:8081
+#    restart: always
+
+#volumes:
+#  mongodb:
+#  mongodb_data_db:
+#  mongodb_data_configdb:
+#  mongodb_docker-entrypoint-initdb.d:

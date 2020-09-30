@@ -1,0 +1,4 @@
+pytest
+redis
+pymongo
+pytest-mock

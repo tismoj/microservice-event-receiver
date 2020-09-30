@@ -1,0 +1,4 @@
+Nameko
+Redis
+PyMongo
+Requests
