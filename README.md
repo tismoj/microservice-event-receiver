@@ -17,3 +17,26 @@ Now in case you added some additional replica nodes because you needed to scale 
 Since all events and its data received are recorded, you have a very good way of tracking down state or scenario related bugs, and even have an option to rollback all replicas and their depended nodes to a known working state, if needed.
 
 I actually started this project around april of 2019 before I initially committed it to Github, previously it was exclusively subversioned using mercurial, so in the commit messages you would notice the original mercurial commit messages copy pasted. It started as a microservice template that I use for my other microservice projects but I decided to separate it as its own prior to the Github commit, to make easier to update across all the projects that uses it. And I just modify it as the needs from the different projects arises. So if you know of any other similar opensource project out there doing the same thing, I would like to know about it, so do please inform me.
+
+## HOW TO USE:
+
+- Clone from github
+```bash
+$ git clone https://github.com/tismoj/microservice-event-receiver
+```
+
+- Start up all microservices and support apps
+```bash
+$ docker-compose up -d --build
+```
+
+- To view logs
+```bash
+$ docker-compose logs -f
+```
+
+- To send a Request directly to the sample microservice hello_microservice
+```bash
+$ curl -X POST -H 'Content-Type: application/json' localhost:8888/hello/ -d '{"name": "tismoj"}'
+{"hello":{"response":"Hello, tismoj!"}}
+```
