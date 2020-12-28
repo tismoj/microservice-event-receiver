@@ -10,4 +10,8 @@ This project hopes to alleviate that scenario by providing an easy to integrate 
 
 The concept is simple normally microservices receive request either from other microservices or input from the user.
 
-Instead simply funnel all the vital state changing communications between microservices to go through the event_receiver
+Instead simply just funnel all the vital state changing communications between microservices (let's call them events) to go through the event_receiver_microservice. And then have each microservice that is expecting to receive a particular event to simply register for that event in the event_listener_registrar_microservice, and all events received by event_receiver_microservice will be distributed to each microservice that had registered for that event. Now if you had registered all replica nodes to the same event then all replica nodes will recieve that event, and in turn those replica node can then update their individual state variable, their individual database, or their individual file and all data should remain consistent.
+
+Now in case you added some additional replica nodes because you needed to scale up, the replica can opt to register for the same event with a datetime range if you want it to receive all relevent past events to have it go through all of the events simulating how the other already existing replicas had received those events in the past. Where if done correctly that new replica should be able to update its individual state variables, its individual database, or its individual file to be consistent with the other replicas.
+
+Since all events and its data received are recorded, you have a very good way of tracking down state or scenario related bugs, and even have an option to rollback all replicas and their depended nodes to a known working state, if needed.
