@@ -40,3 +40,37 @@ $ docker-compose logs -f
 $ curl -X POST -H 'Content-Type: application/json' localhost:8888/hello/ -d '{"name": "tismoj"}'
 {"hello":{"response":"Hello, tismoj!"}}
 ```
+
+- To send a similar Request through the event_receiver, but prior to registering hello_microservice to any events
+```bash
+$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_human -d '{"name": "tismoj while unregistered"}'
+{"event_received":{"data":{"name":"tismoj while unregistered","transaction_id":"20201228220527.235058"},"event":"request_from_human:20201228220527.235058"}}
+```
+
+- To register hello_microservice to the event request_from_human
+```bash
+$ curl -X POST -H 'Content-Type: application/json' localhost:8888/register_for_events/ -d '{"events_to_register": [{"event": "request_from_human", "urls_to_register": [{"url": "http://api:8080/hello/"}]}]}'
+{"registered_for_events": {"request_from_human": {"http://api:8080/hello/": {}}}}
+```
+
+- To send a similar Request through the event_receiver, but this time hello_microservice is registered to receive all events of the event request_from_human
+```bash
+$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_human -d '{"name": "tismoj now registered"}'
+{"event_received":{"data":{"name":"tismoj now registered","transaction_id":"20201228220741.306084"},"event":"request_from_human:20201228220741.306084"}}
+```
+
+- To check if the event is actually received by the hello_microservice, we could only check through the api_1 app, as I still couldn't figure out how to log prints from any microservice started via nameko
+```bash
+$ docker-compose logs api
+...
+api_1                                    | In RegisterForEvents: Listen for Events with JSON data: {'events_to_register': [{'event': 'request_from_human', 'urls_to_register': [{'url': 'http://api:8080/hello/'}]}]}
+api_1                                    | Micro-service returned with a response: {"registered_for_events": {"request_from_human": {"http://api:8080/hello/": {}}}}
+api_1                                    | 172.27.0.1 - - [28/Dec/2020 22:07:24] "POST /register_for_events/ HTTP/1.1" 200 -
+api_1                                    | In ReceiveEvent: Received event: request_from_human, with JSON data: {'name': 'tismoj now registered'}
+api_1                                    | Micro-service returned with a response: {"event_received": {"event": "request_from_human:20201228220741.306084", "data": {"name": "tismoj now registered", "transaction_id": "20201228220741.306084"}}}
+api_1                                    | 172.27.0.1 - - [28/Dec/2020 22:07:41] "POST /receive_event/request_from_human HTTP/1.1" 200 -
+api_1                                    | In Hello: Received Event with JSON data: {'name': 'tismoj now registered', 'transaction_id': '20201228220741.306084'}
+api_1                                    | Microservice returned with a response: {"hello": {"response": "Hello, tismoj now registered!"}}
+api_1                                    | 172.27.0.9 - - [28/Dec/2020 22:07:41] "POST /hello/ HTTP/1.1" 200 -
+...
+```
