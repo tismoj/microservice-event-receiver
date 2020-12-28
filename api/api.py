@@ -10,15 +10,18 @@ CONFIG = {'AMQP_URI': "amqp://guest:guest@rabbitmq"}
 
 
 class Hello(Resource):
-    def get(self, name):
-        print("Received request for Hello from " + name)
+    def post(self):
+        data = request.get_json()
+        print("In Hello: Received Event with JSON data: " + str(data))
         with ClusterRpcProxy(CONFIG) as rpc:
-            response = rpc.hello_microservice.hello(name)
-            print("Microservice returned with a response: " + response)
-            return response
+            if 'name' not in data:
+                return rpc.event_receiver_microservice.receive_event('Hello_arg_missing-name', data)
+            response = rpc.hello_microservice.hello(data)
+            print("Microservice returned with a response: " + json.dumps(response))
+            return jsonify(response)
 
 
-api.add_resource(Hello, '/', '/hello/<string:name>')
+api.add_resource(Hello, '/', '/hello/')
 
 
 class RegisterForEvents(Resource):
@@ -28,8 +31,8 @@ class RegisterForEvents(Resource):
         with ClusterRpcProxy(CONFIG) as rpc:
             if 'events_to_register' not in data:
                 return rpc.event_receiver_microservice.receive_event('RegisterForEvents_arg_missing-events_to_register', data)
-            response = rpc.event_listener_registrar_microservice.register_for_events()
-            print("Micro-service returned with a response: " + response)
+            response = rpc.event_listener_registrar_microservice.register_for_events(data)
+            print("Micro-service returned with a response: " + json.dumps(response))
             return response
 
 

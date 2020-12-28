@@ -160,6 +160,7 @@ class CommonLib:
                 time.sleep(retry_interval)
                 retry -= 1
                 continue
+            retry = 0
         return resp
 
     def reduce_count_if_attribute_is_present(self, event_id, url):
