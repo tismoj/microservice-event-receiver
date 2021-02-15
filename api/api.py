@@ -46,7 +46,7 @@ class ReceiveEvent(Resource):
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.event_receiver_microservice.receive_event(event_id, data)
             print("Micro-service returned with a response: " + json.dumps(response))
-            if 'redirect_url' in data:
+            if 'redirect_url' in data and data['redirect_url'] != '':
                 return redirect(data['redirect_url'])
             else:
                 return jsonify(response)
