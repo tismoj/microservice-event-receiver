@@ -25,23 +25,14 @@ def api_client():
 def test_hello(api_client):
     """
     GIVEN a Flask application
-    WHEN the '/hello/<name>' page is requested (GET) and given a name argument
-    THEN that name argument should appear in the returned string
+    WHEN the '/hello/' page is requested (GET) and given a name member in the JSON payload
+    THEN that name's value should appear in the returned string
     """
-    response = api_client.get('/hello/Flask')
+    response = api_client.post('/hello/', json={
+        'name': 'Flask'
+    })
     assert response.status_code == 200
     assert b'Hello, Flask!' in response.data
-
-    with api.app.test_request_context('/hello/Flask?name=some_name'):
-        assert flask.request.path == '/hello/Flask'
-        assert flask.request.args['name'] == 'some_name'
-
-    with api.app.test_client() as c:
-        rv = c.get('/hello/Flask?name=some_other_name')
-        assert request.path == '/hello/Flask'
-        assert request.args['name'] == 'some_other_name'
-        assert rv.status_code == 200
-        assert b'Hello, Flask!' in rv.data
 
 
 # def test_distribute_event(api_client):

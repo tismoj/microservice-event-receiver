@@ -9,7 +9,7 @@ services:
       - event_listener_registrar_microservice
       - event_receiver_microservice
     ports:
-      - "8888:8080"
+      - "8880:8080"
     command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "python", "-u", "api.py"]
     restart: always
 

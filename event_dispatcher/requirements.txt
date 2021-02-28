@@ -1,3 +1,4 @@
 Redis
 PyMongo
+pytest-mock
 Requests
