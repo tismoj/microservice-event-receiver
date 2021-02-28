@@ -86,15 +86,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-#      - ./mongodb/:/home/mongodb/
-#      - ./data/db/:/data/db/
-#      - ./data/configdb/:/data/configdb/
-#      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+      - ./mongodb/:/home/mongodb/
+      - ./data/db/:/data/db/
+      - ./data/configdb/:/data/configdb/
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
       ### Use this on MacOS hosts, MongoDB and the MacOS FS mapping has issues, only volume mapping will work properly
-      - mongodb:/home/mongodb/
-      - mongodb_data_db:/data/db/
-      - mongodb_data_configdb:/data/configdb/
-      - mongodb_docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d/
+#      - mongodb:/home/mongodb/
+#      - mongodb_data_db:/data/db/
+#      - mongodb_data_configdb:/data/configdb/
+#      - mongodb_docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d/
 #    ports:
 #      - 27017:27017
     command: --storageEngine wiredTiger --directoryperdb
@@ -111,8 +111,8 @@ services:
 #      - 8081:8081
 #    restart: always
 
-volumes:
-  mongodb:
-  mongodb_data_db:
-  mongodb_data_configdb:
-  mongodb_docker-entrypoint-initdb.d:
+#volumes:
+#  mongodb:
+#  mongodb_data_db:
+#  mongodb_data_configdb:
+#  mongodb_docker-entrypoint-initdb.d:
