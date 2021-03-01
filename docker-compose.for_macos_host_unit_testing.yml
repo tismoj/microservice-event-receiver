@@ -6,6 +6,7 @@ services:
     depends_on:
       - rabbitmq
       - hello_microservice
+      - hello2_microservice
       - event_listener_registrar_microservice
       - event_receiver_microservice
     ports:
