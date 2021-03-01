@@ -41,27 +41,27 @@ $ docker-compose logs -f
 ### Typical / Normal RESTapi Request via Curl
 - To send a Request directly to the sample microservice hello_microservice
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/hello/ -d '{"name": "tismoj"}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/hello/ -d '{"name": "tismoj"}'
 {"hello":{"response":"Hello, tismoj!"}}
 ```
 
 ### Sending of a similar Request through the event_receiver, without any microservice, registered to receive it
 - To send a similar Request through the event_receiver, but prior to registering hello_microservice to any events
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_human -d '{"name": "tismoj while unregistered"}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_human -d '{"name": "tismoj while unregistered"}'
 {"event_received":{"data":{"name":"tismoj while unregistered","transaction_id":"20201228220527.235058"},"event":"request_from_human:20201228220527.235058"}}
 ```
 
 ### Sending of another similar Request through the event_receiver, with a microservice, registered to receive it
 - To register hello_microservice to the event request_from_human
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/register_for_events/ -d '{"events_to_register": [{"event": "request_from_human", "urls_to_register": [{"url": "http://api:8080/hello/"}]}]}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/register_for_events/ -d '{"events_to_register": [{"event": "request_from_human", "urls_to_register": [{"url": "http://api:8080/hello/"}]}]}'
 {"registered_for_events": {"request_from_human": {"http://api:8080/hello/": {}}}}
 ```
 
 - To send a similar Request through the event_receiver, but this time hello_microservice is registered to receive all events of the event request_from_human
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_human -d '{"name": "tismoj now registered"}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_human -d '{"name": "tismoj now registered"}'
 {"event_received":{"data":{"name":"tismoj now registered","transaction_id":"20201228220741.306084"},"event":"request_from_human:20201228220741.306084"}}
 ```
 
@@ -83,14 +83,14 @@ api_1                                    | 172.27.0.9 - - [28/Dec/2020 22:07:41]
 ### Sending a new event without again any registered microservice to receive
 - Send a request with a new event name request_from_animal
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_animal -d '{"name": "cat"}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_animal -d '{"name": "cat"}'
 {"event_received":{"data":{"name":"cat","transaction_id":"20201228230007.695724"},"event":"request_from_animal:20201228230007.695724"}}
 ```
 
 ### Registering hello_microservice for the new Event, but triggering to send all prior events starting from a given "datetime_start"
 - To also register hello_microservice to the event request_from_animal, with a datetime_start requirement
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/register_for_events/ -d '{"events_to_register": [{"event": "request_from_animal", "urls_to_register": [{"url": "http://api:8080/hello/", "datetime_start": "20201228230007.0"}]}]}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/register_for_events/ -d '{"events_to_register": [{"event": "request_from_animal", "urls_to_register": [{"url": "http://api:8080/hello/", "datetime_start": "20201228230007.0"}]}]}'
 {"registered_for_retro_event_retrieval": {"request_from_animal": {"http://api:8080/hello/": {"datetime_start": "20201228230007.0"}}}}
 ```
 ```bash
@@ -108,7 +108,7 @@ Microservice returned with a response: {"hello": {"response": "Hello, cat!"}}
 
 - To send another request with the new event request_from_animal, but this time hello_microservice is registered to receive all events of the event request_from_animal as well
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/receive_event/request_from_animal -d '{"name": "dog"}'{"event_received":{"data":{"name":"dog","transaction_id":"20201228232305.280595"},"event":"request_from_animal:20201228232305.280595"}}
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_animal -d '{"name": "dog"}'{"event_received":{"data":{"name":"dog","transaction_id":"20201228232305.280595"},"event":"request_from_animal:20201228232305.280595"}}
 ```
 ```bash
 $ docker-compose logs api
@@ -124,7 +124,7 @@ Microservice returned with a response: {"hello": {"response": "Hello, dog!"}}
 ### Registering to retrieve past events given a "count"
 - To register and retrieve past events, with a count requirement
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8888/register_for_events/ -d '{"events_to_register": [{"event": "request_from_human", "urls_to_register": [{"url": "http://api:8080/hello/", "datetime_start": "20200101000000.0", "count": 1}]}]}'
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/register_for_events/ -d '{"events_to_register": [{"event": "request_from_human", "urls_to_register": [{"url": "http://api:8080/hello/", "datetime_start": "20200101000000.0", "count": 1}]}]}'
 {"registered_for_retro_event_retrieval": {"request_from_human": {"http://api:8080/hello/": {"datetime_start": "20200101000000.0", "count": 1}}}}
 ```
 ```bash
