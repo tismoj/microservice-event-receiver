@@ -23,7 +23,7 @@ I started this project around April of 2019 before I initially committed it to G
 ### Install Procedure
 - Clone from GitHub
 ```bash
-$ git clone https://github.com/tismoj/microservice-event-receiver
+$ git clone https://github.com/tismoj/microservice-event-receiver && cd microservice-event-receiver
 ```
 
 ### Startup Procedure
@@ -108,7 +108,8 @@ Microservice returned with a response: {"hello": {"response": "Hello, cat!"}}
 
 - To send another request with the new event request_from_animal, but this time hello_microservice is registered to receive all events of the event request_from_animal as well
 ```bash
-$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_animal -d '{"name": "dog"}'{"event_received":{"data":{"name":"dog","transaction_id":"20201228232305.280595"},"event":"request_from_animal:20201228232305.280595"}}
+$ curl -X POST -H 'Content-Type: application/json' localhost:8880/receive_event/request_from_animal -d '{"name": "dog"}'
+{"event_received":{"data":{"name":"dog","transaction_id":"20201228232305.280595"},"event":"request_from_animal:20201228232305.280595"}}
 ```
 ```bash
 $ docker-compose logs api
