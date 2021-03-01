@@ -24,6 +24,18 @@ class Hello(Resource):
 api.add_resource(Hello, '/', '/hello/')
 
 
+class Hello2(Resource):
+    def get(self, name):
+        print("Received request for Hello2 from " + name)
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.hello2_microservice.hello2(name)
+            print("Microservice returned with a response: " + response)
+            return response
+
+
+api.add_resource(Hello2, '/', '/hello2/<string:name>')
+
+
 class RegisterForEvents(Resource):
     def post(self):
         data = request.get_json()

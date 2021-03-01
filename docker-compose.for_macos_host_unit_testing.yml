@@ -19,6 +19,12 @@ services:
       - rabbitmq
     command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "nameko", "run", "--broker", "amqp://guest:guest@rabbitmq", "hello_microservice"]
 
+  hello2_microservice:
+    build: ./hello2_microservice/
+    depends_on:
+      - rabbitmq
+    command: ["./wait-for-it.sh", "rabbitmq:5672", "-s", "-t", "480", "--", "nameko", "run", "--broker", "amqp://guest:guest@rabbitmq", "hello2_microservice"]
+
   event_listener_registrar_microservice:
     build: event_listener_registrar_microservice/
     depends_on:

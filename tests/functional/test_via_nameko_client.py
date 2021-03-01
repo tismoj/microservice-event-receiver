@@ -15,6 +15,17 @@ def test_hello_microservice():
         assert result == {"hello": {"response": "Hello, Nameko Client!"}}
 
 
+def test_hello2_microservice():
+    """
+    GIVEN a Nameko client
+    WHEN the 'hello2_microservice.hello2(name)' is invoked and given a name argument
+    THEN that name argument should appear in the returned formatted string
+    """
+    with ClusterRpcProxy(CONFIG) as rpc:
+        result = rpc.hello2_microservice.hello2("Nameko Client")
+        assert result == "Hello, Nameko Client!"
+
+
 def test_event_receiver_microservice():
     """
     GIVEN a Nameko client
